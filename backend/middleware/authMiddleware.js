@@ -24,7 +24,8 @@ exports.protect = async (req, res, next) => {
         }
 
         // Check if token is in activeSessions (Session management)
-        if (!currentUser.activeSessions.includes(token)) {
+        const sessionExists = currentUser.activeSessions.some(session => session.token === token);
+        if (!sessionExists) {
             return res.status(401).json({ message: 'Session invalidated. Please login again.' });
         }
 

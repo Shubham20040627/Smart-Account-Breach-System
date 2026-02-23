@@ -117,7 +117,10 @@ exports.login = async (req, res) => {
         }
 
         // 5. Session Management
-        user.activeSessions.push(token);
+        user.activeSessions.push({
+            token,
+            deviceId: fingerprint.deviceId
+        });
         user.failedLoginAttempts = []; // Reset on success
         await user.save();
 
@@ -156,9 +159,30 @@ exports.login = async (req, res) => {
 exports.logout = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        user.activeSessions = user.activeSessions.filter(t => t !== req.token);
+        user.activeSessions = user.activeSessions.filter(s => s.token !== req.token);
         await user.save();
         res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.revokeDeviceSession = async (req, res) => {
+    try {
+        const { deviceId } = req.body;
+        const user = await User.findById(req.user.id);
+
+        // Find and remove all sessions for this deviceId
+        user.activeSessions = user.activeSessions.filter(s => s.deviceId !== deviceId);
+        await user.save();
+
+        // Optional: Emit security update
+        try {
+            const io = getIO();
+            io.to(user._id.toString()).emit('SECURITY_UPDATE');
+        } catch (err) { }
+
+        res.status(200).json({ message: 'Device access revoked' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

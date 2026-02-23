@@ -44,6 +44,20 @@ const Dashboard = () => {
         }
     };
 
+    const handleRevokeDevice = async (deviceId) => {
+        if (!window.confirm('Revoke access for this device?')) return;
+        setActionLoading(true);
+        try {
+            await authService.revokeDeviceSession(deviceId);
+            // Refresh security status after revocation
+            await fetchStatus();
+        } catch (err) {
+            alert('Revocation failed');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     if (loading) return (
         <div className="flex-center" style={{ minHeight: '100vh' }}>
             <div style={{ width: '3rem', height: '3rem', border: '4px solid #38bdf8', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin"></div>
@@ -138,9 +152,30 @@ const Dashboard = () => {
                                             </p>
                                         </div>
                                     </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Last accessed</p>
-                                        <p style={{ fontSize: '0.75rem', fontWeight: '500' }}>{new Date(device.lastLogin).toLocaleDateString()}</p>
+                                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end', flexShrink: 0 }}>
+                                        <div>
+                                            <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Last accessed</p>
+                                            <p style={{ fontSize: '0.75rem', fontWeight: '500' }}>{new Date(device.lastLogin).toLocaleDateString()}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => handleRevokeDevice(device.deviceId)}
+                                            disabled={actionLoading}
+                                            className="revoke-btn"
+                                            style={{
+                                                padding: '0.35rem 0.75rem',
+                                                fontSize: '0.75rem',
+                                                backgroundColor: '#ef4444',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '0.375rem',
+                                                cursor: 'pointer',
+                                                fontWeight: '600',
+                                                transition: 'all 0.2s',
+                                                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)'
+                                            }}
+                                        >
+                                            Revoke Access
+                                        </button>
                                     </div>
                                 </div>
                             ))}

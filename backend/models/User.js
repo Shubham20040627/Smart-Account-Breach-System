@@ -37,10 +37,10 @@ const UserSchema = new mongoose.Schema({
     lastLogin: { type: Date, default: Date.now },
     verified: { type: Boolean, default: true }
   }],
-  activeSessions: {
-    type: [String], // Array of valid JWT tokens
-    default: []
-  }
+  activeSessions: [{
+    token: String,
+    deviceId: String
+  }]
 }, { timestamps: true });
 
 // Hash password before saving
