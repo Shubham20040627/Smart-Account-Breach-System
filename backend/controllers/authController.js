@@ -117,6 +117,9 @@ exports.login = async (req, res) => {
         }
 
         // 5. Session Management
+        // Clean up old string-based sessions to prevent validation errors
+        user.activeSessions = user.activeSessions.filter(s => typeof s === 'object' && s.token);
+
         user.activeSessions.push({
             token,
             deviceId: fingerprint.deviceId
