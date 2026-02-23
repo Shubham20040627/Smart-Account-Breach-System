@@ -116,6 +116,7 @@ exports.login = async (req, res) => {
             user.trustedDevices[deviceIndex].IP = fingerprint.IP;
             user.trustedDevices[deviceIndex].browser = fingerprint.browser;
             user.trustedDevices[deviceIndex].OS = fingerprint.OS;
+            user.markModified('trustedDevices');
         }
 
         // 5. Session Management
