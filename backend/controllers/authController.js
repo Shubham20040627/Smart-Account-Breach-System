@@ -64,9 +64,9 @@ exports.login = async (req, res) => {
             await LoginAttempt.create({
                 userId: user._id,
                 success: false,
-                IP: fingerprint.ip,
+                IP: fingerprint.IP,
                 browser: fingerprint.browser,
-                OS: fingerprint.os
+                OS: fingerprint.OS
             });
 
             if (recentAttempts.length >= 5) {
@@ -109,11 +109,11 @@ exports.login = async (req, res) => {
             await sendEmail({
                 email: user.email,
                 subject: 'Security Alert: New Device Login',
-                message: `A new login was detected on your account from ${fingerprint.browser} on ${fingerprint.OS} (IP: ${fingerprint.ip}).`
+                message: `A new login was detected on your account from ${fingerprint.browser} on ${fingerprint.OS} (IP: ${fingerprint.IP}).`
             });
         } else {
             user.trustedDevices[deviceIndex].lastLogin = Date.now();
-            user.trustedDevices[deviceIndex].IP = fingerprint.ip;
+            user.trustedDevices[deviceIndex].IP = fingerprint.IP;
         }
 
         // 5. Session Management
@@ -139,9 +139,9 @@ exports.login = async (req, res) => {
         await LoginAttempt.create({
             userId: user._id,
             success: true,
-            IP: fingerprint.ip,
+            IP: fingerprint.IP,
             browser: fingerprint.browser,
-            OS: fingerprint.os
+            OS: fingerprint.OS
         });
 
         res.status(200).json({
