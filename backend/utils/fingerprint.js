@@ -20,7 +20,7 @@ exports.getFingerprint = (req) => {
     return {
         deviceId,
         browser,
-        os,
+        OS: os,
         ip
     };
 };

@@ -109,7 +109,7 @@ exports.login = async (req, res) => {
             await sendEmail({
                 email: user.email,
                 subject: 'Security Alert: New Device Login',
-                message: `A new login was detected on your account from ${fingerprint.browser} on ${fingerprint.os} (IP: ${fingerprint.ip}).`
+                message: `A new login was detected on your account from ${fingerprint.browser} on ${fingerprint.OS} (IP: ${fingerprint.ip}).`
             });
         } else {
             user.trustedDevices[deviceIndex].lastLogin = Date.now();
