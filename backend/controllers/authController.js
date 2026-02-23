@@ -3,6 +3,7 @@ const LoginAttempt = require('../models/LoginAttempt');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/email');
 const { getFingerprint } = require('../utils/fingerprint');
+const { getIO } = require('../utils/socket');
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -80,6 +81,13 @@ exports.login = async (req, res) => {
             }
 
             await user.save();
+
+            // Emit Security Update
+            try {
+                const io = getIO();
+                io.to(user._id.toString()).emit('SECURITY_UPDATE');
+            } catch (err) { }
+
             return res.status(401).json({
                 message: 'Invalid credentials',
                 attemptsRemaining: 5 - recentAttempts.length
@@ -112,6 +120,15 @@ exports.login = async (req, res) => {
         user.activeSessions.push(token);
         user.failedLoginAttempts = []; // Reset on success
         await user.save();
+
+        // Emit Security Update
+        try {
+            const io = getIO();
+            io.to(user._id.toString()).emit('SECURITY_UPDATE');
+            if (deviceIndex === -1) {
+                io.to(user._id.toString()).emit('SECURITY_ALERT', 'New device detected. Check your dashboard.');
+            }
+        } catch (err) { }
 
         await LoginAttempt.create({
             userId: user._id,
@@ -152,6 +169,13 @@ exports.logoutAllDevices = async (req, res) => {
         const user = await User.findById(req.user.id);
         user.activeSessions = []; // Invalidate all tokens
         await user.save();
+
+        // Emit Logout All event via Socket
+        try {
+            const io = getIO();
+            io.to(user._id.toString()).emit('LOGOUT_ALL');
+        } catch (err) { }
+
         res.status(200).json({ message: 'Logged out from all devices' });
     } catch (error) {
         res.status(500).json({ message: error.message });

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
-    const { user, logout } = useAuth();
+    const { user, logout, refreshTrigger } = useAuth();
     const [securityData, setSecurityData] = useState({
         accountStatus: 'ACTIVE',
         trustedDevices: [],
@@ -29,7 +29,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchStatus();
-    }, []);
+    }, [refreshTrigger]);
 
     const handleLogoutAll = async () => {
         if (!window.confirm('This will invalidate all sessions. Continue?')) return;
