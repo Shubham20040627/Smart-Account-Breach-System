@@ -211,7 +211,7 @@ const Dashboard = () => {
                                                 )}
                                             </td>
                                             <td>
-                                                <p style={{ fontSize: '0.875rem', fontWeight: '500' }}>{attempt.browser}</p>
+                                                <p style={{ fontSize: '0.875rem', fontWeight: '500' }}>{attempt.browser} on {attempt.OS}</p>
                                                 <p style={{ fontSize: '0.625rem', color: '#64748b' }}>{attempt.IP}</p>
                                             </td>
                                             <td style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
