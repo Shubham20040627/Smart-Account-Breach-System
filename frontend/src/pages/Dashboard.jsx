@@ -146,7 +146,7 @@ const Dashboard = () => {
                                             <Monitor size={20} color="#64748b" />
                                         </div>
                                         <div>
-                                            <p style={{ fontWeight: 'bold' }}>{device.browser} on {device.OS}</p>
+                                            <p style={{ fontWeight: 'bold' }}>{device.browser} on {device.OS || device.os}</p>
                                             <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.125rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                 <Globe size={12} /> {device.IP}
                                             </p>
