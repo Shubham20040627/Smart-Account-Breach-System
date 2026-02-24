@@ -226,8 +226,17 @@ exports.getSecurityStatus = async (req, res) => {
 
 exports.getCPPAudit = async (req, res) => {
     try {
+        const user = await User.findById(req.user.id);
         const fingerprint = getFingerprint(req);
-        const result = await executeCPPDemo(fingerprint.deviceId);
+
+        const sessionCount = user ? user.sessions.length : 0;
+
+        const result = await executeCPPDemo(
+            fingerprint.deviceId,
+            fingerprint.IP,
+            sessionCount
+        );
+
         res.status(200).json({ result });
     } catch (error) {
         res.status(500).json({ message: error.message });

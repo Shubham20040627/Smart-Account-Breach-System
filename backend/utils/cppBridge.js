@@ -5,18 +5,18 @@ const fs = require('fs');
 /**
  * Executes the C++ DSA Logic Demo and returns the output.
  */
-exports.executeCPPDemo = (arg = '') => {
+exports.executeCPPDemo = (...args) => {
     return new Promise((resolve, reject) => {
         const cppFilePath = path.join(__dirname, '../../dsa_logic_demo/SmartSecurityLogic.cpp');
         const outputBinary = path.join(__dirname, '../../dsa_logic_demo/logic_demo.exe'); // For Windows
 
-        // Sanitize argument to prevent command injection
-        const safeArg = arg.replace(/[^a-zA-Z0-9_-]/g, '');
+        // Sanitize all arguments
+        const safeArgs = args.map(arg => String(arg).replace(/[^a-zA-Z0-9._-]/g, '')).join(' ');
 
         // Command to compile and run (Assuming g++ is installed)
         // On Render/Linux, the binary won't have .exe
         const compileCmd = `g++ "${cppFilePath}" -o "${outputBinary}"`;
-        const runCmd = `"${outputBinary}" ${safeArg}`;
+        const runCmd = `"${outputBinary}" ${safeArgs}`;
 
         // Check if file exists
         if (!fs.existsSync(cppFilePath)) {
