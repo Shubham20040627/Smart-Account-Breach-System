@@ -67,11 +67,45 @@ public:
     }
 };
 
+// --- 3. SLIDING WINDOW (For Rate Limiting) ---
+class RateLimiter {
+private:
+    vector<time_t> attempts;
+    int windowSeconds, maxAttempts;
+
+public:
+    RateLimiter(int seconds, int max) : windowSeconds(seconds), maxAttempts(max) {}
+    
+    void loadExistingAttempts(int count) {
+        time_t now = time(0);
+        for(int i = 0; i < count; i++) {
+            // Simulate attempts within the window (e.g., 30s ago)
+            attempts.push_back(now - 30);
+        }
+    }
+
+    bool audit() {
+        time_t now = time(0);
+        int currentCount = attempts.size();
+
+        if (currentCount >= maxAttempts) {
+            cout << "[SECURITY ALERT] " << currentCount << " failed attempts in sliding window! Account at high risk." << endl;
+            return false;
+        } else if (currentCount > 0) {
+            cout << "[CAUTION] " << currentCount << " recent attempts detected. Window is monitoring activity." << endl;
+            return true;
+        }
+        cout << "[OK] No anomalies detected in current time-window. System: OPTIMIZED." << endl;
+        return true;
+    }
+};
+
 int main(int argc, char* argv[]) {
     // Dynamic Inputs from Node.js
     string currentDeviceId = (argc > 1) ? argv[1] : "unknown_device";
     string userIP = (argc > 2) ? argv[2] : "0.0.0.0";
     int activeSessionsCount = (argc > 3) ? atoi(argv[3]) : 0;
+    int failedAttemptsCount = (argc > 4) ? atoi(argv[4]) : 0;
     
     cout << "=== Smart Account Breach System: C++ DSA Engine ===" << endl << endl;
 
@@ -96,12 +130,10 @@ int main(int argc, char* argv[]) {
     
     cout << "[INFO] Current Database Status: " << activeSessionsCount << "/3 sessions active." << endl;
     
-    // Pre-populate with existing sessions if any
     for(int i = 0; i < activeSessionsCount - 1; i++) {
         sessions.enqueue("Existing_Session_" + to_string(i+1));
     }
 
-    // Demonstrate logic using the USER'S REAL IP
     cout << "[ACTION] Verifying your current session..." << endl;
     sessions.enqueue(userIP);
     
@@ -112,8 +144,11 @@ int main(int argc, char* argv[]) {
 
     // 3. Brute Force Audit (Sliding Window Animation)
     cout << "--- Stage 3: Brute Force Audit (DSA: Sliding Window) ---" << endl;
-    cout << "[ANALYSIS] Scanning access timestamps for IP " << userIP << "..." << endl;
-    cout << "[OK] No anomalies detected in current time-window. System: OPTIMIZED." << endl;
+    RateLimiter limiter(120, 5); // 2 minute window, 5 attempt limit
+    limiter.loadExistingAttempts(failedAttemptsCount);
+    
+    cout << "[ANALYSIS] Scanning access timestamps for your account..." << endl;
+    limiter.audit();
 
     return 0;
 }

@@ -230,11 +230,13 @@ exports.getCPPAudit = async (req, res) => {
         const fingerprint = getFingerprint(req);
 
         const sessionCount = user ? user.activeSessions.length : 0;
+        const failedCount = user ? user.failedLoginAttempts.length : 0;
 
         const result = await executeCPPDemo(
             fingerprint.deviceId,
             fingerprint.IP,
-            sessionCount
+            sessionCount,
+            failedCount
         );
 
         res.status(200).json({ result });
