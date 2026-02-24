@@ -229,7 +229,7 @@ exports.getCPPAudit = async (req, res) => {
         const user = await User.findById(req.user.id);
         const fingerprint = getFingerprint(req);
 
-        const sessionCount = user ? user.sessions.length : 0;
+        const sessionCount = user ? user.activeSessions.length : 0;
 
         const result = await executeCPPDemo(
             fingerprint.deviceId,
