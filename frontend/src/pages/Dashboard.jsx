@@ -15,6 +15,8 @@ const Dashboard = () => {
     });
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
+    const [auditResult, setAuditResult] = useState('');
+    const [auditLoading, setAuditLoading] = useState(false);
 
     const fetchStatus = async () => {
         try {
@@ -49,12 +51,24 @@ const Dashboard = () => {
         setActionLoading(true);
         try {
             await authService.revokeDeviceSession(deviceId);
-            // Refresh security status after revocation
             await fetchStatus();
         } catch (err) {
             alert('Revocation failed');
         } finally {
             setActionLoading(false);
+        }
+    };
+
+    const handleCPPAudit = async () => {
+        setAuditLoading(true);
+        setAuditResult('Compiling and running C++ Core Logic Engine...\n');
+        try {
+            const { data } = await authService.getCPPAudit();
+            setAuditResult(prev => prev + data.result);
+        } catch (err) {
+            setAuditResult(prev => prev + 'Error executing C++ Logic: ' + err.message);
+        } finally {
+            setAuditLoading(false);
         }
     };
 
@@ -130,6 +144,46 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* C++ Audit Section */}
+                <div className="glass-card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{ padding: '0.5rem', backgroundColor: 'rgba(56, 189, 248, 0.1)', borderRadius: '0.5rem' }}>
+                                <Shield color="#38bdf8" size={20} />
+                            </div>
+                            <div>
+                                <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold' }}>C++ DSA Logic Verifier</h3>
+                                <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Runs standalone C++ binary to audit system logic</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={handleCPPAudit}
+                            disabled={auditLoading}
+                            className="btn"
+                            style={{ width: 'auto', padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}
+                        >
+                            {auditLoading ? 'Auditing...' : 'Run C++ Security Audit'}
+                        </button>
+                    </div>
+
+                    {auditResult && (
+                        <div style={{
+                            backgroundColor: '#0f172a',
+                            padding: '1rem',
+                            borderRadius: '0.5rem',
+                            fontSize: '0.875rem',
+                            fontFamily: 'monospace',
+                            color: '#38bdf8',
+                            border: '1px solid #1e293b',
+                            maxHeight: '200px',
+                            overflowY: 'auto',
+                            whiteSpace: 'pre-wrap'
+                        }}>
+                            {auditResult}
+                        </div>
+                    )}
                 </div>
 
                 <div className="section-grid">

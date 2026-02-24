@@ -3,6 +3,7 @@ const LoginAttempt = require('../models/LoginAttempt');
 const jwt = require('jsonwebtoken');
 const { getFingerprint } = require('../utils/fingerprint');
 const { getIO } = require('../utils/socket');
+const { executeCPPDemo } = require('../utils/cppBridge');
 
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -218,6 +219,15 @@ exports.getSecurityStatus = async (req, res) => {
             trustedDevices: req.user.trustedDevices,
             loginHistory: attempts
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+exports.getCPPAudit = async (req, res) => {
+    try {
+        const result = await executeCPPDemo();
+        res.status(200).json({ result });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

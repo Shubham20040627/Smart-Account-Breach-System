@@ -32,6 +32,7 @@ export const authService = {
     logoutAll: () => api.post('/auth/logout-all'),
     getSecurityStatus: () => api.get('/auth/security-status'),
     revokeDeviceSession: (deviceId) => api.post('/auth/revoke-device', { deviceId }),
+    getCPPAudit: () => api.get('/auth/cpp-audit'),
 };
 
 export default api;
