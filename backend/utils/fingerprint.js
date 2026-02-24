@@ -5,7 +5,12 @@ exports.getFingerprint = (req) => {
     const ip = req.ip || req.connection.remoteAddress || 'unknown';
 
     // Extract simple OS/Browser info from user agent (more robust detection)
-    const os = /Android|iOS|Windows|Mac|Linux/.exec(userAgent)?.[0] || 'Unknown OS';
+    let os = 'Unknown OS';
+    if (userAgent.includes('Android')) os = 'Android';
+    else if (userAgent.includes('iPhone') || userAgent.includes('iPad') || userAgent.includes('iOS')) os = 'iOS';
+    else if (userAgent.includes('Windows')) os = 'Windows';
+    else if (userAgent.includes('Macintosh') || userAgent.includes('Mac OS')) os = 'Mac';
+    else if (userAgent.includes('Linux')) os = 'Linux';
 
     let browser = 'Unknown Browser';
     if (userAgent.includes('Edg')) browser = 'Edge';
