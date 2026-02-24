@@ -110,7 +110,8 @@ int main(int argc, char* argv[]) {
     SessionQueue sessions(3);
     sessions.enqueue("192.168.1.1");
     sessions.enqueue("103.45.12.9");
-    sessions.enqueue("192.168.1.1"); // Reuse IP
+    sessions.enqueue("172.16.0.1"); // 3rd IP
+    sessions.enqueue("1.1.1.1");      // 4th IP -> TRIGGER BLOCK
     cout << "[INFO] Queue manages sessions in O(1) space." << endl << endl;
 
     // 3. Brute Force Check (Sliding Window)
