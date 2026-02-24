@@ -57,6 +57,14 @@ public:
         count++;
         cout << "[SUCCESS] Enqueued IP: " << ip << " (Sessions: " << count << "/" << capacity << ")" << endl;
     }
+
+    void dequeue() {
+        if (count == 0) return;
+        string removed = queue[front];
+        front = (front + 1) % capacity;
+        count--;
+        cout << "[LOGOUT] Freed Slot from IP: " << removed << " (Sessions: " << count << "/" << capacity << ")" << endl;
+    }
 };
 
 // --- 3. SLIDING WINDOW (For Rate Limiting) ---
@@ -112,6 +120,10 @@ int main(int argc, char* argv[]) {
     sessions.enqueue("103.45.12.9");
     sessions.enqueue("172.16.0.1"); // 3rd IP
     sessions.enqueue("1.1.1.1");      // 4th IP -> TRIGGER BLOCK
+    
+    cout << "[ACTION] Simulating User Logout..." << endl;
+    sessions.dequeue(); // Remove first IP
+    sessions.enqueue("1.1.1.1");      // Now 1.1.1.1 should SUCCEED
     cout << "[INFO] Queue manages sessions in O(1) space." << endl << endl;
 
     // 3. Brute Force Check (Sliding Window)
