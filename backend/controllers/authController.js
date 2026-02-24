@@ -107,19 +107,18 @@ exports.login = async (req, res) => {
         }
 
         // 5. Session Management (IP-based Rate Limiting/Circular Queue Logic)
-        // Check if this is a new IP and if we reached the limit of 3 unique IPs
+        // Clean up old sessions first to get an accurate count
+        user.activeSessions = user.activeSessions.filter(s => typeof s === 'object' && s.token);
+
         const activeIPs = [...new Set(user.activeSessions.map(s => s.IP))];
         const isNewIP = !activeIPs.includes(fingerprint.IP);
 
-        if (isNewIP && activeIPs.length >= 3) {
+        if (isNewIP && activeIPs.length >= 1) {
             return res.status(403).json({
-                message: 'Login blocked: This account is already active on 3 different networks/IPs. Please logout from another device first.',
+                message: 'Login blocked: You are already logged in from another network/location. Please logout there first.',
                 limitReached: true
             });
         }
-
-        // Clean up old string-based sessions
-        user.activeSessions = user.activeSessions.filter(s => typeof s === 'object' && s.token);
 
         user.activeSessions.push({
             token,
