@@ -230,7 +230,11 @@ exports.getCPPAudit = async (req, res) => {
         const fingerprint = getFingerprint(req);
 
         const sessionCount = user ? user.activeSessions.length : 0;
-        const failedCount = user ? user.failedLoginAttempts.length : 0;
+
+        // Ensure audit only shows attempts in the EXACT last 2 minutes
+        const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+        const recentAttempts = user ? user.failedLoginAttempts.filter(t => t > twoMinutesAgo) : [];
+        const failedCount = recentAttempts.length;
 
         const result = await executeCPPDemo(
             fingerprint.deviceId,
