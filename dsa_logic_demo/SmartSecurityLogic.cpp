@@ -94,18 +94,19 @@ int main(int argc, char* argv[]) {
     cout << "--- Stage 2: Session Capacity Check (DSA: Circular Queue) ---" << endl;
     SessionQueue sessions(3);
     
-    // Simulate current state + one new attempt
-    cout << "[INFO] Current Real-time Sessions: " << activeSessionsCount << "/3" << endl;
+    cout << "[INFO] Current Database Status: " << activeSessionsCount << "/3 sessions active." << endl;
     
+    // Pre-populate with existing sessions if any
+    for(int i = 0; i < activeSessionsCount - 1; i++) {
+        sessions.enqueue("Existing_Session_" + to_string(i+1));
+    }
+
     // Demonstrate logic using the USER'S REAL IP
-    cout << "[ACTION] Validating Current User IP: " << userIP << endl;
+    cout << "[ACTION] Verifying your current session..." << endl;
     sessions.enqueue(userIP);
     
-    // Show the "Full" logic if user is at limit or simulate it
     if (activeSessionsCount >= 3) {
         cout << "[CRITICAL] Session limit reached. Circular Queue is at peak capacity." << endl;
-    } else {
-        cout << "[SAFE] Session space available in O(1) buffer." << endl;
     }
     cout << endl;
 
