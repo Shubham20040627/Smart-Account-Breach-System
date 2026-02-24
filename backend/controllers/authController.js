@@ -236,11 +236,15 @@ exports.getCPPAudit = async (req, res) => {
         const recentAttempts = user ? user.failedLoginAttempts.filter(t => t > twoMinutesAgo) : [];
         const failedCount = recentAttempts.length;
 
+        // Fetch real trusted devices for the BST check
+        const trustedIds = user ? user.trustedDevices.map(d => d.deviceId).join(',') : 'none';
+
         const result = await executeCPPDemo(
             fingerprint.deviceId,
             fingerprint.IP,
             sessionCount,
-            failedCount
+            failedCount,
+            trustedIds
         );
 
         res.status(200).json({ result });

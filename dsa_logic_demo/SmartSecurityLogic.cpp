@@ -3,6 +3,7 @@
 #include <string>
 #include <ctime>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -79,7 +80,6 @@ public:
     void loadExistingAttempts(int count) {
         time_t now = time(0);
         for(int i = 0; i < count; i++) {
-            // Simulate attempts within the window (e.g., 30s ago)
             attempts.push_back(now - 30);
         }
     }
@@ -106,19 +106,26 @@ int main(int argc, char* argv[]) {
     string userIP = (argc > 2) ? argv[2] : "0.0.0.0";
     int activeSessionsCount = (argc > 3) ? atoi(argv[3]) : 0;
     int failedAttemptsCount = (argc > 4) ? atoi(argv[4]) : 0;
+    string trustedIdsStr = (argc > 5) ? argv[5] : "";
     
     cout << "=== Smart Account Breach System: C++ DSA Engine ===" << endl << endl;
 
     // 1. Device Identity Search (BST Transformation)
     cout << "--- Stage 1: Trusted Device Retrieval (DSA: Binary Search Tree) ---" << endl;
     DeviceVault vault;
-    vault.addDevice("device_123");
-    vault.addDevice("device_456");
-    vault.addDevice("a1b2c3d4e5");
+    
+    // Dynamically Build BST from Real Data
+    if (trustedIdsStr != "" && trustedIdsStr != "none") {
+        stringstream ss(trustedIdsStr);
+        string id;
+        while (getline(ss, id, ',')) {
+            if (!id.empty()) vault.addDevice(id);
+        }
+    }
 
     cout << "[BST-SEARCH] Looking for Device ID: " << currentDeviceId << endl;
     if (vault.isTrusted(currentDeviceId)) {
-        cout << "[VERIFIED] Device recognized in O(log N) steps. Access Granted." << endl;
+        cout << "[VERIFIED] Hardware recognized in O(log N) steps. Access Granted." << endl;
     } else {
         cout << "[WARNING] NEW DEVICE detected! Path not found in BST. Triggering Security Alert." << endl;
     }
@@ -127,16 +134,12 @@ int main(int argc, char* argv[]) {
     // 2. Session Control (Circular Queue)
     cout << "--- Stage 2: Session Capacity Check (DSA: Circular Queue) ---" << endl;
     SessionQueue sessions(3);
-    
     cout << "[INFO] Current Database Status: " << activeSessionsCount << "/3 sessions active." << endl;
-    
     for(int i = 0; i < activeSessionsCount - 1; i++) {
         sessions.enqueue("Existing_Session_" + to_string(i+1));
     }
-
     cout << "[ACTION] Verifying your current session..." << endl;
     sessions.enqueue(userIP);
-    
     if (activeSessionsCount >= 3) {
         cout << "[CRITICAL] Session limit reached. Circular Queue is at peak capacity." << endl;
     }
@@ -144,9 +147,8 @@ int main(int argc, char* argv[]) {
 
     // 3. Brute Force Audit (Sliding Window Animation)
     cout << "--- Stage 3: Brute Force Audit (DSA: Sliding Window) ---" << endl;
-    RateLimiter limiter(120, 5); // 2 minute window, 5 attempt limit
+    RateLimiter limiter(120, 5); 
     limiter.loadExistingAttempts(failedAttemptsCount);
-    
     cout << "[ANALYSIS] Scanning access timestamps for your account..." << endl;
     limiter.audit();
 
