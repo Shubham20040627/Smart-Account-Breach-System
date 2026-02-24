@@ -1,7 +1,6 @@
 const User = require('../models/User');
 const LoginAttempt = require('../models/LoginAttempt');
 const jwt = require('jsonwebtoken');
-const jwt = require('jsonwebtoken');
 const { getFingerprint } = require('../utils/fingerprint');
 const { getIO } = require('../utils/socket');
 
