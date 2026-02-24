@@ -40,7 +40,8 @@ const UserSchema = new mongoose.Schema({
   activeSessions: {
     type: [{
       token: String,
-      deviceId: String
+      deviceId: String,
+      IP: String
     }],
     default: []
   }

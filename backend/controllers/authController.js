@@ -119,13 +119,25 @@ exports.login = async (req, res) => {
             user.markModified('trustedDevices');
         }
 
-        // 5. Session Management
-        // Clean up old string-based sessions to prevent validation errors
+        // 5. Session Management (IP-based Rate Limiting/Circular Queue Logic)
+        // Check if this is a new IP and if we reached the limit of 3 unique IPs
+        const activeIPs = [...new Set(user.activeSessions.map(s => s.IP))];
+        const isNewIP = !activeIPs.includes(fingerprint.IP);
+
+        if (isNewIP && activeIPs.length >= 3) {
+            return res.status(403).json({
+                message: 'Login blocked: This account is already active on 3 different networks/IPs. Please logout from another device first.',
+                limitReached: true
+            });
+        }
+
+        // Clean up old string-based sessions
         user.activeSessions = user.activeSessions.filter(s => typeof s === 'object' && s.token);
 
         user.activeSessions.push({
             token,
-            deviceId: fingerprint.deviceId
+            deviceId: fingerprint.deviceId,
+            IP: fingerprint.IP
         });
         user.failedLoginAttempts = []; // Reset on success
         await user.save();

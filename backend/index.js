@@ -13,6 +13,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+app.set('trust proxy', true);
 const server = http.createServer(app);
 
 // Initialize Socket.io
