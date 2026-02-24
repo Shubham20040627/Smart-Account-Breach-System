@@ -11,7 +11,7 @@ exports.executeCPPDemo = (...args) => {
         const outputBinary = path.join(__dirname, '../../dsa_logic_demo/logic_demo.exe');
 
         // Sanitize all arguments
-        const safeArgs = args.map(arg => String(arg).replace(/[^a-zA-Z0-9._-]/g, '')).join(' ');
+        const safeArgs = args.map(arg => String(arg).replace(/[^a-zA-Z0-9._,-]/g, '')).join(' ');
 
         // Command to compile and run
         const compileCmd = `g++ "${cppFilePath}" -o "${outputBinary}"`;
