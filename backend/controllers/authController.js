@@ -113,7 +113,7 @@ exports.login = async (req, res) => {
         const activeIPs = [...new Set(user.activeSessions.map(s => s.IP))];
         const isNewIP = !activeIPs.includes(fingerprint.IP);
 
-        if (isNewIP && activeIPs.length >= 1) {
+        if (isNewIP && activeIPs.length >= 3) {
             return res.status(403).json({
                 message: 'Login blocked: You are already logged in from another network/location. Please logout there first.',
                 limitReached: true
