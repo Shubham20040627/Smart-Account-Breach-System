@@ -4,13 +4,15 @@ exports.getFingerprint = (req) => {
     const userAgent = req.headers['user-agent'] || 'unknown';
     const ip = req.ip || req.connection.remoteAddress || 'unknown';
 
-    // Extract simple OS/Browser info from user agent (more robust detection)
+    // Extract simple OS/Browser info from user agent (case-insensitive detection)
     let os = 'Unknown OS';
-    if (userAgent.includes('Android')) os = 'Android';
-    else if (userAgent.includes('iPhone') || userAgent.includes('iPad') || userAgent.includes('iOS')) os = 'iOS';
-    else if (userAgent.includes('Windows')) os = 'Windows';
-    else if (userAgent.includes('Macintosh') || userAgent.includes('Mac OS')) os = 'Mac';
-    else if (userAgent.includes('Linux')) os = 'Linux';
+    const ua = userAgent.toLowerCase();
+
+    if (ua.includes('android')) os = 'Android';
+    else if (ua.includes('iphone') || ua.includes('ipad') || ua.includes('ios')) os = 'iOS';
+    else if (ua.includes('windows')) os = 'Windows';
+    else if (ua.includes('macintosh') || ua.includes('mac os')) os = 'Mac';
+    else if (ua.includes('linux')) os = 'Linux';
 
     let browser = 'Unknown Browser';
     if (userAgent.includes('Edg')) browser = 'Edge';
