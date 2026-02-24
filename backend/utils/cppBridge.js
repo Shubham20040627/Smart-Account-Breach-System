@@ -8,33 +8,38 @@ const fs = require('fs');
 exports.executeCPPDemo = (...args) => {
     return new Promise((resolve, reject) => {
         const cppFilePath = path.join(__dirname, '../../dsa_logic_demo/SmartSecurityLogic.cpp');
-        const outputBinary = path.join(__dirname, '../../dsa_logic_demo/logic_demo.exe'); // For Windows
+        const outputBinary = path.join(__dirname, '../../dsa_logic_demo/logic_demo.exe');
 
         // Sanitize all arguments
         const safeArgs = args.map(arg => String(arg).replace(/[^a-zA-Z0-9._-]/g, '')).join(' ');
 
-        // Command to compile and run (Assuming g++ is installed)
-        // On Render/Linux, the binary won't have .exe
+        // Command to compile and run
         const compileCmd = `g++ "${cppFilePath}" -o "${outputBinary}"`;
         const runCmd = `"${outputBinary}" ${safeArgs}`;
 
-        // Check if file exists
         if (!fs.existsSync(cppFilePath)) {
             return reject(new Error('C++ Source file not found'));
         }
 
-        // 1. Try to compile (to ensure it's up to date)
-        exec(compileCmd, (compileErr) => {
-            // If compilation fails, try to run existing binary if it exists
-            // (Useful for environments where g++ might be missing but binary is there)
+        // 🛠️ Robust Update Strategy:
+        // Delete old binary first to ensure we aren't running stale code if compilation fails
+        try {
+            if (fs.existsSync(outputBinary)) {
+                fs.unlinkSync(outputBinary);
+            }
+        } catch (err) {
+            console.error('Warning: Could not delete old C++ binary (it might be in use).');
+        }
 
+        exec(compileCmd, (compileErr) => {
+            // Even if compilation fails, try to run (in case it's a Linux environment or binary exists)
             exec(runCmd, (runErr, stdout, stderr) => {
                 if (runErr) {
-                    // If even running fails, maybe we are on Linux/Render
-                    const linuxRunCmd = `g++ "${cppFilePath}" -o logic_demo && ./logic_demo ${safeArg}`;
+                    // Fallback for Linux/Render environment
+                    const linuxRunCmd = `g++ "${cppFilePath}" -o logic_demo && ./logic_demo ${safeArgs}`;
                     exec(linuxRunCmd, (linuxErr, lStdout, lStderr) => {
                         if (linuxErr) {
-                            return resolve("C++ Logic Engine: [OFFLINE]");
+                            return resolve("C++ Logic Engine: [OFFLINE]. Make sure g++ is installed.");
                         }
                         resolve(lStdout);
                     });
