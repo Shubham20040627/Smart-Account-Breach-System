@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const LoginAttempt = require('../models/LoginAttempt');
 const jwt = require('jsonwebtoken');
-const sendEmail = require('../utils/email');
+const jwt = require('jsonwebtoken');
 const { getFingerprint } = require('../utils/fingerprint');
 const { getIO } = require('../utils/socket');
 
@@ -72,12 +72,6 @@ exports.login = async (req, res) => {
             if (recentAttempts.length >= 5) {
                 user.accountStatus = 'LOCKED';
                 user.lockUntil = new Date(Date.now() + 10 * 60 * 1000); // Lock for 10 mins
-
-                await sendEmail({
-                    email: user.email,
-                    subject: 'Security Alert: Account Locked',
-                    message: `Your account has been locked for 10 minutes due to 5 failed login attempts within 2 minutes.`
-                });
             }
 
             await user.save();
@@ -104,12 +98,6 @@ exports.login = async (req, res) => {
             user.trustedDevices.push({
                 ...fingerprint,
                 verified: true
-            });
-
-            await sendEmail({
-                email: user.email,
-                subject: 'Security Alert: New Device Login',
-                message: `A new login was detected on your account from ${fingerprint.browser} on ${fingerprint.OS} (IP: ${fingerprint.IP}).`
             });
         } else {
             user.trustedDevices[deviceIndex].lastLogin = Date.now();
